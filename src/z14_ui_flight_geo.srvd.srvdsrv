@@ -1,0 +1,4 @@
+@EndUserText.label: 'Service Definition for Flight Geo App'
+define service Z14_UI_FLIGHT_GEO {
+  expose Z14_C_FLIGHTWITHGEO;
+}

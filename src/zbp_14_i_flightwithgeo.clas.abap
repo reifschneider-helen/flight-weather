@@ -1,0 +1,5 @@
+CLASS zbp_14_i_flightwithgeo DEFINITION PUBLIC ABSTRACT FINAL FOR BEHAVIOR OF z14_i_flightwithgeo.
+ENDCLASS.
+
+CLASS zbp_14_i_flightwithgeo IMPLEMENTATION.
+ENDCLASS.
