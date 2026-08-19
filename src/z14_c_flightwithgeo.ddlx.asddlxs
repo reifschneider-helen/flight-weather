@@ -1,37 +1,97 @@
 @Metadata.layer: #CORE
+@Search.searchable: true
+
 annotate entity Z14_C_FLIGHTWITHGEO with
 {
-  @UI.lineItem: [ { position: 10 } ]
-  @UI.identification: [ { position: 10 } ]
-  CarrierId;
-  @UI.lineItem: [ { position: 20 } ]
-  @UI.identification: [ { position: 20 } ]
-  ConnectionId;
-  @UI.lineItem: [ { position: 30 } ]
-  @UI.identification: [ { position: 30 } ]
-  FlightDate;
-  @UI.lineItem: [ { position: 40 } ]
-  @UI.identification: [ { position: 40 } ]
-  Price;
-  @UI.lineItem: [ { position: 50 } ]
-  @UI.identification: [ { position: 50 } ]
-  CurrencyCode;
-  @UI.lineItem: [ { position: 60 } ]
-  @UI.identification: [ { position: 60 } ]
-  PlaneTypeId;
-  @UI.lineItem: [ { position: 70 } ]
-  @UI.identification: [ { position: 70 } ]
-  SeatsMax;
-  @UI.lineItem: [ { position: 80 } ]
-  @UI.identification: [ { position: 80 } ]
-  SeatsOccupied;
+  @UI.facet: [ {
 
-  @UI.lineItem: [ { position: 90 } ]
-  @UI.identification: [ { position: 90 } ]
+        id: 'GeneralInfo',
+        type: #IDENTIFICATION_REFERENCE,
+        label: 'Flight information',
+        purpose: #STANDARD,
+        position: 10
+
+      },
+
+      {  id: 'GeoData',
+         type: #FIELDGROUP_REFERENCE,
+         label: 'Geo Data (Coordinates)',
+         targetQualifier: 'GeoDataGroup',
+         position: 20
+      },
+
+      {  id: 'WeatherData',
+         type: #FIELDGROUP_REFERENCE,
+         label: 'Weather Information',
+         targetQualifier: 'WeatherGroup',
+         position: 30
+      }
+
+  ]
+
+
+  @UI.lineItem: [ { position: 10 } ]
+  @UI.identification: [{ position: 10 }]
+  @Search.defaultSearchElement: true
+  CarrierId;
+
+  @UI.lineItem: [ { position: 20 } ]
+  @UI.identification: [{ position: 20 }]
+  @Search.defaultSearchElement: true
+  ConnectionId;
+
+  @UI.lineItem: [ { position: 30 } ]
+  @UI.identification: [{ position: 30 }]
+  FlightDate;
+
+  @UI.lineItem: [ { position: 40 } ]
+  @UI.identification: [{ position: 40 }]
+  Price;
+
+  @UI.lineItem: [ { position: 50 } ]
+  @UI.identification: [{ position: 50 }]
   AirportFromId;
-  @UI.lineItem: [ { position: 100 } ]
-  @UI.identification: [ { position: 100 } ]
+
+  @UI.lineItem: [ { position: 60 } ]
+  @UI.identification: [{ position: 60 }]
   AirportToId;
+
+  //  GEO DATA
+
+  @UI.fieldGroup: [{ qualifier: 'GeoDataGroup', position: 10 }]
+  @EndUserText.label: 'Departure Airport Latitude:'
+  DepartureLatitude;
+
+  @UI.fieldGroup: [{ qualifier: 'GeoDataGroup', position: 20 }]
+  @EndUserText.label: 'Departure Airport Longitude:'
+  DepartureLongitude;
+
+  @UI.fieldGroup: [{ qualifier: 'GeoDataGroup', position: 30 }]
+  @EndUserText.label: 'Arrival Airport Latitude:'
+  ArrivalLatitude;
+
+  @UI.fieldGroup: [{ qualifier: 'GeoDataGroup', position: 40 }]
+  @EndUserText.label: 'Arrival Airport Longitude:'
+  ArrivalLongitude;
+
+  //  WEATHER
+
+  @UI.fieldGroup: [{ qualifier: 'WeatherGroup', position: 10 }]
+  @EndUserText.label: 'Departure Airport Weather:'
+  DepartureWeatherStatus;
+
+  @UI.fieldGroup: [{ qualifier: 'WeatherGroup', position: 20 }]
+  @EndUserText.label: 'Departure Airport Temperature:'
+  DepartureTemperature;
+
+  @UI.fieldGroup: [{ qualifier: 'WeatherGroup', position: 30 }]
+  @EndUserText.label: 'Arrival Airport Weather:'
+  ArrivalWeatherStatus;
+
+  @UI.fieldGroup: [{ qualifier: 'WeatherGroup', position: 40 }]
+  @EndUserText.label: 'Arrival Airport Temperature:'
+  ArrivalTemperature;
+
 
 
 }

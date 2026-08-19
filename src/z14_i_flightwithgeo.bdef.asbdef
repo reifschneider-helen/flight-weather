@@ -21,12 +21,45 @@ etag master LocalLastChangedAt
 
   draft determine action Prepare;
 
+  determination setAirportData on modify { field CarrierId, ConnectionId; }
+
+  determination setWeatherData on modify
+  { field DepartureLatitude, DepartureLongitude,
+    ArrivalLatitude, ArrivalLongitude, FlightDate; }
+
+
+  side effects
+  {
+    field CarrierId affects $self,
+        field AirportFromId,
+        field AirportToId,
+        field DepartureLatitude,
+        field DepartureLongitude,
+        field ArrivalLatitude,
+        field ArrivalLongitude;
+
+    field ConnectionId affects $self,
+        field AirportFromId,
+        field AirportToId,
+        field DepartureLatitude,
+        field DepartureLongitude,
+        field ArrivalLatitude,
+        field ArrivalLongitude;
+  }
+
+
+  field ( readonly : update ) CarrierId, ConnectionId, FlightDate;
+
   field ( readonly ) AirportFromId,
-                     AirportToId,
-                     DepartureLatitude,
-                     DepartureLongitude,
-                     ArrivalLatitude,
-                     ArrivalLongitude;
+  AirportToId,
+  DepartureLatitude,
+  DepartureLongitude,
+  ArrivalLatitude,
+  ArrivalLongitude,
+  DepartureWeatherStatus,
+  DepartureTemperature,
+  ArrivalWeatherStatus,
+  ArrivalTemperature;
 
   mapping for z14_flights
     {

@@ -31,7 +31,12 @@ define root view entity Z14_I_FlightWithGeo
 
       _ArrivalGeo.latitude          as ArrivalLatitude,
       _ArrivalGeo.longitude         as ArrivalLongitude,
-
+      
+      cast( '' as abap.char(40) )   as DepartureWeatherStatus,
+      cast( 0.0 as abap.dec(4,2) )  as DepartureTemperature,
+      
+      cast( '' as abap.char(40) )   as ArrivalWeatherStatus,
+      cast( 0.0 as abap.dec(4,2) )  as ArrivalTemperature,
 
       Flights.local_created_by      as LocalCreatedBy,
       Flights.local_created_at      as LocalCreatedAt,

@@ -67,14 +67,6 @@ CLASS z14_test_open_meteo_api IMPLEMENTATION.
 
 
 
-        select
-        from /DMO/AIRPORT
-        fields *
-        into table @data(lt_scarr).
-
-        out->write( lt_scarr ).
-
-
       CATCH cx_root INTO DATA(lx_error).
         out->write( '--- Fehler bei der Verbindung ---' ).
         out->write( lx_error->get_text( ) ).

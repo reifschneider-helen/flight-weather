@@ -1,0 +1,25 @@
+CLASS zcl_14_clear_draft DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
+
+  PUBLIC SECTION.
+
+    INTERFACES if_oo_adt_classrun .
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+ENDCLASS.
+
+
+
+CLASS zcl_14_clear_draft IMPLEMENTATION.
+
+
+  METHOD if_oo_adt_classrun~main.
+  DELETE
+  FROM Z14_FLIGHTS_D.
+
+  COMMIT WORK.
+
+  ENDMETHOD.
+ENDCLASS.
