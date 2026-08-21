@@ -6,43 +6,47 @@ define root view entity Z14_C_FLIGHTWITHGEO
   provider contract transactional_query
   as projection on Z14_I_FlightWithGeo
 {
+  key UUID,
+  
       @Consumption.valueHelpDefinition: [{
         entity: { name: 'Z14_I_CarrierVH', element: 'AirlineID' }
       }]
-  key CarrierId,
+      CarrierId,
+      
       @Consumption.valueHelpDefinition: [{
           entity: { name: 'Z14_I_ConnectionVH', element: 'ConnectionId' },
-          additionalBinding: [{
-            localElement: 'CarrierId', element: 'CarrierId', usage: #FILTER_AND_RESULT
-          },
-          { localElement: 'AirportFromId', element: 'AirportFromId', usage: #RESULT },
-          { localElement: 'AirportToId', element: 'AirportToId', usage: #RESULT }
+          additionalBinding: [
+          { localElement: 'CarrierId', element: 'CarrierId', usage: #FILTER_AND_RESULT }
           ]
       }]
+      ConnectionId,
 
-  key ConnectionId,
-  key FlightDate,
+      FlightDate,
+      
       @Semantics.amount.currencyCode: 'CurrencyCode'
       Price,
       CurrencyCode,
-      PlaneTypeId,
-      SeatsMax,
-      SeatsOccupied,
 
+      //    CONNECTION FIELDS
       AirportFromId,
       AirportToId,
 
+      //    GEO DATA
       DepartureLatitude,
       DepartureLongitude,
       ArrivalLatitude,
       ArrivalLongitude,
-      
+
+      //    WEATHER
       DepartureWeatherStatus,
       DepartureTemperature,
-      
       ArrivalWeatherStatus,
       ArrivalTemperature,
 
+      //    Travel advice depending on weather
+      TravelAdvisory,
+
+      //    ADMIN FIELDS
       LocalCreatedBy,
       LocalCreatedAt,
       LocalLastChangedBy,

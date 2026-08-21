@@ -1,5 +1,11 @@
 @Metadata.layer: #CORE
 @Search.searchable: true
+@UI.headerInfo:  {
+ typeName: 'Flight',
+ typeNamePlural: 'Flights',
+ title: { type: #STANDARD, value: 'CarrierId' },
+ description: { type: #STANDARD, value: 'ConnectionId' }
+       }
 
 annotate entity Z14_C_FLIGHTWITHGEO with
 {
@@ -26,7 +32,6 @@ annotate entity Z14_C_FLIGHTWITHGEO with
          targetQualifier: 'WeatherGroup',
          position: 30
       }
-
   ]
 
 
@@ -92,6 +97,8 @@ annotate entity Z14_C_FLIGHTWITHGEO with
   @EndUserText.label: 'Arrival Airport Temperature:'
   ArrivalTemperature;
 
-
+  @UI.fieldGroup: [{ qualifier: 'WeatherGroup', position: 50 }]
+  @EndUserText.label: 'Travel Hinweis:'
+  TravelAdvisory;
 
 }

@@ -6,9 +6,13 @@
 "/DMO/I_CARRIER"
 ],
 "ASSOCIATED":
-[],
+[
+"I_CURRENCY"
+],
 "BASE":
-[],
+[
+"/DMO/I_CARRIER"
+],
 "ANNO_REF":
 [],
 "SCALAR_FUNCTION":

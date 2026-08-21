@@ -21,36 +21,30 @@ etag master LocalLastChangedAt
 
   draft determine action Prepare;
 
-  determination setAirportData on modify { field CarrierId, ConnectionId; }
+  determination setFlightMasterData on modify { field CarrierId, ConnectionId; }
 
   determination setWeatherData on modify
   { field DepartureLatitude, DepartureLongitude,
     ArrivalLatitude, ArrivalLongitude, FlightDate; }
 
+side effects {
+    field FlightDate affects
+        field DepartureWeatherStatus,
+        field DepartureTemperature,
+        field ArrivalWeatherStatus,
+        field ArrivalTemperature,
+        permissions ( field FlightDate ); }
 
-  side effects
-  {
-    field CarrierId affects $self,
-        field AirportFromId,
-        field AirportToId,
-        field DepartureLatitude,
-        field DepartureLongitude,
-        field ArrivalLatitude,
-        field ArrivalLongitude;
+  field ( readonly, numbering : managed ) UUID;
 
-    field ConnectionId affects $self,
-        field AirportFromId,
-        field AirportToId,
-        field DepartureLatitude,
-        field DepartureLongitude,
-        field ArrivalLatitude,
-        field ArrivalLongitude;
-  }
+  field ( mandatory: create, readonly: update ) CarrierId, ConnectionId;
 
+  field ( mandatory: create, features: instance ) FlightDate;
 
-  field ( readonly : update ) CarrierId, ConnectionId, FlightDate;
+  field ( features: instance ) CurrencyCode;
 
-  field ( readonly ) AirportFromId,
+  field ( readonly )
+  AirportFromId,
   AirportToId,
   DepartureLatitude,
   DepartureLongitude,
@@ -59,18 +53,17 @@ etag master LocalLastChangedAt
   DepartureWeatherStatus,
   DepartureTemperature,
   ArrivalWeatherStatus,
-  ArrivalTemperature;
+  ArrivalTemperature,
+  TravelAdvisory;
 
   mapping for z14_flights
     {
+      UUID               = uuid;
       CarrierId          = carrier_id;
       ConnectionId       = connection_id;
       FlightDate         = flight_date;
       Price              = price;
       CurrencyCode       = currency_code;
-      PlaneTypeId        = plane_type_id;
-      SeatsMax           = seats_max;
-      SeatsOccupied      = seats_occupied;
       LocalCreatedBy     = local_created_by;
       LocalCreatedAt     = local_created_at;
       LocalLastChangedBy = local_last_changed_by;

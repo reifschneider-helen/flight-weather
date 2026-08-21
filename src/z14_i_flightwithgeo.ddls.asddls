@@ -13,38 +13,43 @@ define root view entity Z14_I_FlightWithGeo
   association [0..1] to z14_airports_geo as _ArrivalGeo
     on _Connection.airport_to_id = _ArrivalGeo.airport_id
 {
-  key Flights.carrier_id            as CarrierId,
-  key Flights.connection_id         as ConnectionId,
-  key Flights.flight_date           as FlightDate,
+  key Flights.uuid as UUID,
+   Flights.carrier_id            as CarrierId,
+   Flights.connection_id         as ConnectionId,
+   Flights.flight_date           as FlightDate,
       @Semantics.amount.currencyCode: 'CurrencyCode'
       Flights.price                 as Price,
       Flights.currency_code         as CurrencyCode,
-      Flights.plane_type_id         as PlaneTypeId,
-      Flights.seats_max             as SeatsMax,
-      Flights.seats_occupied        as SeatsOccupied,
 
+//    CONNECTION DATA
       _Connection.airport_from_id   as AirportFromId,
       _Connection.airport_to_id     as AirportToId,
 
+//    GEO DATA
       _DepartureGeo.latitude        as DepartureLatitude,
       _DepartureGeo.longitude       as DepartureLongitude,
 
       _ArrivalGeo.latitude          as ArrivalLatitude,
       _ArrivalGeo.longitude         as ArrivalLongitude,
       
+//    WEATHER
       cast( '' as abap.char(40) )   as DepartureWeatherStatus,
-      cast( 0.0 as abap.dec(4,2) )  as DepartureTemperature,
+      cast( 0.0 as abap.dec(4,1) )  as DepartureTemperature,
       
       cast( '' as abap.char(40) )   as ArrivalWeatherStatus,
-      cast( 0.0 as abap.dec(4,2) )  as ArrivalTemperature,
+      cast( 0.0 as abap.dec(4,1) )  as ArrivalTemperature,
+      
+//    Travel advice depending on weather
+      cast( '' as abap.char(255) ) as TravelAdvisory,
 
+//    ADMIN FIELDS
       Flights.local_created_by      as LocalCreatedBy,
       Flights.local_created_at      as LocalCreatedAt,
       Flights.local_last_changed_by as LocalLastChangedBy,
       Flights.local_last_changed_at as LocalLastChangedAt,
       Flights.last_changed_at       as LastChangedAt,
 
-
+//    ASSOCIATIONS
       _DepartureGeo,
       _ArrivalGeo
 }

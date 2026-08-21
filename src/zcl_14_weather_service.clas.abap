@@ -5,7 +5,11 @@ CLASS zcl_14_weather_service DEFINITION
 
   PUBLIC SECTION.
     INTERFACES:
-      zif_14_weather_service.
+      zif_14_weather_service,
+      zif_14_weather_constants.
+
+    ALIASES:
+        c_weather_text FOR zif_14_weather_constants~c_weather_text.
 
   PROTECTED SECTION.
   PRIVATE SECTION.
@@ -77,14 +81,14 @@ CLASS zcl_14_weather_service IMPLEMENTATION.
 
   METHOD map_wmo_code_to_text.
     rv_text = COND #(
-        WHEN iv_code = 0                     THEN 'Clear / Sunny'
-        WHEN iv_code BETWEEN 1 AND 2         THEN 'Partly Cloudy'
-        WHEN iv_code = 3                     THEN 'Overcast'
-        WHEN iv_code = 45 OR iv_code = 48    THEN 'Foggy'
-        WHEN iv_code BETWEEN 51 AND 67       THEN 'Rain / Drizzle'
-        WHEN iv_code BETWEEN 71 AND 77       THEN 'Snowfall'
-        WHEN iv_code BETWEEN 80 AND 82       THEN 'Rain Showers'
-        WHEN iv_code BETWEEN 95 AND 99       THEN 'Thunderstorm'
+        WHEN iv_code = 0                     THEN c_weather_text-clear
+        WHEN iv_code BETWEEN 1 AND 2         THEN c_weather_text-cloudy
+        WHEN iv_code = 3                     THEN c_weather_text-overcast
+        WHEN iv_code = 45 OR iv_code = 48    THEN c_weather_text-foggy
+        WHEN iv_code BETWEEN 51 AND 67       THEN c_weather_text-rain
+        WHEN iv_code BETWEEN 71 AND 77       THEN c_weather_text-snow
+        WHEN iv_code BETWEEN 80 AND 82       THEN c_weather_text-showers
+        WHEN iv_code BETWEEN 95 AND 99       THEN c_weather_text-thunderstorm
         ELSE                                      |Code { iv_code }| ).
   ENDMETHOD.
 
