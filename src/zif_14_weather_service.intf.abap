@@ -3,8 +3,8 @@ INTERFACE zif_14_weather_service
 
   TYPES:
     BEGIN OF ty_weather_data,
-      status      TYPE string,
-      temperature TYPE p LENGTH 4 DECIMALS 2,
+      status      TYPE z14_weather_status,
+      temperature TYPE z14_temperature,
     END OF ty_weather_data.
 
   METHODS:

@@ -48,7 +48,6 @@ CLASS lhc_FlightWithGeo IMPLEMENTATION.
     DATA(lt_updates) = lo_flight_service->get_master_data_updates(
                                             CORRESPONDING #( lt_flights ) ).
 
-
     MODIFY ENTITIES OF Z14_i_flightwithgeo IN LOCAL MODE
     ENTITY FlightWithGeo
     UPDATE FIELDS ( CurrencyCode
@@ -57,8 +56,7 @@ CLASS lhc_FlightWithGeo IMPLEMENTATION.
                     DepartureLatitude
                     DepartureLongitude
                     ArrivalLatitude
-                    ArrivalLongitude
-                     )
+                    ArrivalLongitude )
     WITH lt_updates.
 
   ENDMETHOD.
@@ -83,8 +81,7 @@ CLASS lhc_FlightWithGeo IMPLEMENTATION.
     ENTITY flightWithGeo
     UPDATE FIELDS ( DepartureWeatherStatus DepartureTemperature
                     ArrivalWeatherStatus ArrivalTemperature )
-
-    WITH lt_updates .
+    WITH lt_updates.
 
   ENDMETHOD.
 
@@ -106,17 +103,12 @@ CLASS lhc_FlightWithGeo IMPLEMENTATION.
 *                      Always depends on carrier
                         %field-CurrencyCode = if_abap_behv=>fc-f-read_only
 
-
                         %field-FlightDate = COND #(
                             WHEN ls_weather-ArrivalWeatherStatus = c_weather_text-thunderstorm
-                                  OR ls_weather-ArrivalWeatherStatus = c_weather_text-rain
+                             OR ls_weather-ArrivalWeatherStatus = c_weather_text-rain
                               THEN if_abap_behv=>fc-f-unrestricted
-                              ELSE if_abap_behv=>fc-f-read_only
-                            )
-                      )
-                    ).
-
-
+                              ELSE if_abap_behv=>fc-f-read_only )
+                      ) ).
   ENDMETHOD.
 
 ENDCLASS.
