@@ -1,3 +1,15 @@
+CLASS lcl_mock_weather_service DEFINITION FOR TESTING.
+  PUBLIC SECTION.
+    INTERFACES zif_14_weather_service.
+ENDCLASS.
+
+CLASS lcl_mock_weather_service IMPLEMENTATION.
+  METHOD zif_14_weather_service~get_weather.
+    rs_weather-Status = zif_14_weather_constants=>c_weather_text-clear.
+    rs_weather-Temperature = 20.
+  ENDMETHOD.
+ENDCLASS.
+
 CLASS ltcl_flight_service DEFINITION FINAL FOR TESTING
 DURATION SHORT
 RISK LEVEL HARMLESS.
@@ -11,6 +23,8 @@ RISK LEVEL HARMLESS.
       get_master_data_success FOR TESTING,
       get_master_data_empty   FOR TESTING,
       get_master_data_error   FOR TESTING,
+
+      get_weather_success     FOR TESTING,
 
       assert_master_data
         IMPORTING it_flights  TYPE zcl_14_flight_service=>tt_flights
@@ -44,10 +58,10 @@ CLASS ltcl_flight_service IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD get_master_data_empty.
-   DATA(lt_flights) = VALUE zcl_14_flight_service=>tt_flights(  ).
+    DATA(lt_flights) = VALUE zcl_14_flight_service=>tt_flights(  ).
 
-   assert_master_data_error( it_flights = lt_flights
-                             iv_msg = 'Empty flight input must yield initial updates' ).
+    assert_master_data_error( it_flights = lt_flights
+                              iv_msg = 'Empty flight input must yield initial updates' ).
 
     lt_flights = VALUE zcl_14_flight_service=>tt_flights(
                         ( CarrierId = '' ConnectionId = 400 FlightDate = '20260827' ) ).
@@ -57,15 +71,39 @@ CLASS ltcl_flight_service IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD get_master_data_error.
-   DATA(lt_flights) = VALUE zcl_14_flight_service=>tt_flights(
-                        ( CarrierId = 'XZ' ConnectionId = 400 FlightDate = '20260827' ) ).
+    DATA(lt_flights) = VALUE zcl_14_flight_service=>tt_flights(
+                         ( CarrierId = 'XZ' ConnectionId = 400 FlightDate = '20260827' ) ).
 
-   assert_master_data_error( it_flights = lt_flights
-                             iv_msg = 'Invalid CarrierId must yield initial updates' ).
+    assert_master_data_error( it_flights = lt_flights
+                              iv_msg = 'Invalid CarrierId must yield initial updates' ).
 
   ENDMETHOD.
 
 
+  METHOD get_weather_success.
+    DATA lo_mock TYPE REF TO zif_14_weather_service.
+    lo_mock = NEW lcl_mock_weather_service(  ).
+
+    DATA(lt_flights) = VALUE zcl_14_flight_service=>tt_flights(
+                       ( CarrierId          = 'LH'
+                         ConnectionId       = 401
+                         FlightDate         = '20260828'
+                         DepartureLatitude  = '50.1100'
+                         DepartureLongitude = '8.6821'
+                         ArrivalLatitude    = '40.7128'
+                         ArrivalLongitude   = '-74.0060' ) ).
+
+    DATA(lt_updates) = mo_cut->get_weather_updates( it_flights = lt_flights
+                                                     io_weather_service = lo_mock ).
+
+    cl_abap_unit_assert=>assert_not_initial( lt_updates ).
+    cl_abap_unit_assert=>assert_equals( act = lt_updates[ 1 ]-DepartureWeatherStatus
+                                        exp = zif_14_weather_constants=>c_weather_text-clear ).
+
+  ENDMETHOD.
+
+
+**HELPERS*****************
   METHOD assert_master_data.
     DATA(lt_updates) = mo_cut->get_master_data_updates( it_flights ).
 

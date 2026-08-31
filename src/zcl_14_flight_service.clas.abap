@@ -14,8 +14,9 @@ CLASS zcl_14_flight_service DEFINITION
         RETURNING VALUE(rt_updates) TYPE tt_updates,
 
       get_weather_updates
-        IMPORTING it_flights        TYPE tt_flights
-        RETURNING VALUE(rt_updates) TYPE tt_updates.
+        IMPORTING it_flights         TYPE tt_flights
+                  io_weather_service TYPE REF TO zif_14_weather_service OPTIONAL
+        RETURNING VALUE(rt_updates)  TYPE tt_updates.
 
   PROTECTED SECTION.
   PRIVATE SECTION.
@@ -83,10 +84,13 @@ CLASS zcl_14_flight_service IMPLEMENTATION.
       RETURN.
     ENDIF.
 
-    DATA(lo_weather_svc) = CAST zif_14_weather_service( NEW zcl_14_weather_service( ) ).
+    DATA(lo_weather_svc) = COND #( WHEN io_weather_service IS BOUND
+                                   THEN io_weather_service
+                                   ELSE NEW zcl_14_weather_service(  ) ).
 
     LOOP AT it_flights ASSIGNING FIELD-SYMBOL(<ls_flight>).
-      IF <ls_flight>-DepartureLatitude IS INITIAL OR <ls_flight>-FlightDate IS INITIAL.
+      IF <ls_flight>-DepartureLatitude IS INITIAL OR <ls_flight>-ArrivalLatitude
+       OR <ls_flight>-FlightDate IS INITIAL.
         CONTINUE.
       ENDIF.
 
@@ -99,7 +103,6 @@ CLASS zcl_14_flight_service IMPLEMENTATION.
                        ArrivalWeatherStatus =  ls_weather-arrival_status
                        ArrivalTemperature = ls_weather-arrival_temperature
                       ) TO rt_updates.
-
     ENDLOOP.
   ENDMETHOD.
 
