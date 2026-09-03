@@ -20,20 +20,22 @@ RISK LEVEL HARMLESS.
     METHODS:
       setup,
       teardown,
-      get_master_data_success FOR TESTING,
-      get_master_data_empty   FOR TESTING,
-      get_master_data_error   FOR TESTING,
+      get_master_data_success FOR TESTING RAISING ZCX_14_FLIGHT_WEATHER_ERRORS,
+      get_master_data_empty   FOR TESTING RAISING ZCX_14_FLIGHT_WEATHER_ERRORS,
+      get_master_data_error   FOR TESTING RAISING ZCX_14_FLIGHT_WEATHER_ERRORS,
 
-      get_weather_success     FOR TESTING,
+      get_weather_success     FOR TESTING RAISING ZCX_14_FLIGHT_WEATHER_ERRORS,
 
       assert_master_data
         IMPORTING it_flights  TYPE zcl_14_flight_service=>tt_flights
                   iv_exp_curr TYPE /dmo/currency_code
-                  iv_exp_from TYPE /dmo/airport_from_id,
+                  iv_exp_from TYPE /dmo/airport_from_id
+        RAISING ZCX_14_FLIGHT_WEATHER_ERRORS,
 
       assert_master_data_error
         IMPORTING it_flights TYPE zcl_14_flight_service=>tt_flights
-                  iv_msg     TYPE string.
+                  iv_msg     TYPE string
+        RAISING ZCX_14_FLIGHT_WEATHER_ERRORS.
 ENDCLASS.
 
 CLASS ltcl_flight_service IMPLEMENTATION.
@@ -63,10 +65,14 @@ CLASS ltcl_flight_service IMPLEMENTATION.
     assert_master_data_error( it_flights = lt_flights
                               iv_msg = 'Empty flight input must yield initial updates' ).
 
+    TRY.
     lt_flights = VALUE zcl_14_flight_service=>tt_flights(
                         ( CarrierId = '' ConnectionId = 400 FlightDate = '20260827' ) ).
     assert_master_data_error( it_flights = lt_flights
                              iv_msg = 'Empty CarrierId must yield initial updates' ).
+    CATCH zcx_14_flight_weather_errors INTO DATA(lx_error).
+    cl_abap_unit_assert=>assert_bound( act = lx_error ).
+    ENDTRY.
 
   ENDMETHOD.
 
@@ -96,7 +102,7 @@ CLASS ltcl_flight_service IMPLEMENTATION.
     DATA(lt_updates) = mo_cut->get_weather_updates( it_flights = lt_flights
                                                      io_weather_service = lo_mock ).
 
-    cl_abap_unit_assert=>assert_not_initial( lt_updates ).
+    cl_abap_unit_assert=>assert_not_initial( act = lt_updates ).
     cl_abap_unit_assert=>assert_equals( act = lt_updates[ 1 ]-DepartureWeatherStatus
                                         exp = zif_14_weather_constants=>c_weather_text-clear ).
 

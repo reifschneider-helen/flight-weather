@@ -11,12 +11,15 @@ CLASS zcl_14_flight_service DEFINITION
     METHODS:
       get_master_data_updates
         IMPORTING it_flights        TYPE tt_flights
-        RETURNING VALUE(rt_updates) TYPE tt_updates,
+        RETURNING VALUE(rt_updates) TYPE tt_updates
+        RAISING   zcx_14_flight_weather_errors,
 
       get_weather_updates
         IMPORTING it_flights         TYPE tt_flights
                   io_weather_service TYPE REF TO zif_14_weather_service OPTIONAL
-        RETURNING VALUE(rt_updates)  TYPE tt_updates.
+        RETURNING VALUE(rt_updates)  TYPE tt_updates
+        RAISING
+          zcx_14_flight_weather_errors.
 
   PROTECTED SECTION.
   PRIVATE SECTION.
@@ -61,7 +64,17 @@ CLASS zcl_14_flight_service DEFINITION
 
       fetch_currencies
         IMPORTING it_flights           TYPE tt_flights
-        RETURNING VALUE(rt_currencies) TYPE tt_currencies.
+        RETURNING VALUE(rt_currencies) TYPE tt_currencies,
+
+      validate_flight_keys
+        IMPORTING
+          it_flights TYPE zcl_14_flight_service=>tt_flights
+        RAISING
+          zcx_14_flight_weather_errors,
+
+      has_valid_weather_input
+        IMPORTING is_flight       TYPE z14_i_flightwithgeo
+        RETURNING VALUE(rv_valid) TYPE abap_bool.
 
 ENDCLASS.
 
@@ -70,27 +83,48 @@ CLASS zcl_14_flight_service IMPLEMENTATION.
   METHOD get_master_data_updates.
     IF it_flights IS INITIAL. RETURN. ENDIF.
 
+    validate_flight_keys( it_flights ).
+
     DATA(lt_flights) = it_flights.
     DATA(lt_currencies) = fetch_currencies( lt_flights ).
     DATA(lt_connections) = fetch_connections( lt_flights ).
+
+    IF lt_currencies IS INITIAL OR lt_connections IS INITIAL.
+      RETURN.
+    ENDIF.
 
     rt_updates = build_update_structure( it_flights = lt_flights
                                          it_currencies = lt_currencies
                                          it_connections = lt_connections ).
   ENDMETHOD.
 
+  METHOD validate_flight_keys.
+
+    LOOP AT it_flights ASSIGNING FIELD-SYMBOL(<ls_flight>).
+      IF <ls_flight>-CarrierId IS INITIAL
+      OR <ls_flight>-ConnectionId IS INITIAL
+      OR <ls_flight>-FlightDate IS INITIAL.
+        RAISE EXCEPTION NEW zcx_14_flight_weather_errors( textid = zcx_14_flight_weather_errors=>invalid_flight_input_data ).
+      ENDIF.
+    ENDLOOP.
+
+  ENDMETHOD.
+
+
+
   METHOD get_weather_updates.
     IF it_flights IS INITIAL.
       RETURN.
     ENDIF.
+
+    validate_flight_keys( it_flights ).
 
     DATA(lo_weather_svc) = COND #( WHEN io_weather_service IS BOUND
                                    THEN io_weather_service
                                    ELSE NEW zcl_14_weather_service(  ) ).
 
     LOOP AT it_flights ASSIGNING FIELD-SYMBOL(<ls_flight>).
-      IF <ls_flight>-DepartureLatitude IS INITIAL OR <ls_flight>-ArrivalLatitude
-       OR <ls_flight>-FlightDate IS INITIAL.
+      IF NOT has_valid_weather_input( CORRESPONDING #( <ls_flight> ) ).
         CONTINUE.
       ENDIF.
 
@@ -104,6 +138,16 @@ CLASS zcl_14_flight_service IMPLEMENTATION.
                        ArrivalTemperature = ls_weather-arrival_temperature
                       ) TO rt_updates.
     ENDLOOP.
+  ENDMETHOD.
+
+  METHOD has_valid_weather_input.
+    rv_valid = COND #( WHEN is_flight-DepartureLatitude IS INITIAL OR
+                            is_flight-DepartureLongitude IS INITIAL OR
+                            is_flight-ArrivalLatitude IS INITIAL OR
+                            is_flight-ArrivalLongitude IS INITIAL OR
+                            is_flight-FlightDate IS INITIAL
+                       THEN abap_false
+                       ELSE abap_true ).
   ENDMETHOD.
 
   METHOD build_update_structure.
@@ -172,6 +216,10 @@ CLASS zcl_14_flight_service IMPLEMENTATION.
       WHERE carrier_id = @it_flights-CarrierId
             AND connection_id = @it_flights-ConnectionId
       INTO TABLE @rt_connections.
+
+    IF sy-subrc <> 0.
+      CLEAR rt_connections.
+    ENDIF.
   ENDMETHOD.
 
   METHOD fetch_currencies.
@@ -184,6 +232,10 @@ CLASS zcl_14_flight_service IMPLEMENTATION.
     FOR ALL ENTRIES IN @it_flights
     WHERE AirlineId = @it_flights-CarrierId
     INTO CORRESPONDING FIELDS OF TABLE @rt_currencies.
+
+    IF sy-subrc <> 0.
+      CLEAR rt_currencies.
+    ENDIF.
   ENDMETHOD.
 
 
